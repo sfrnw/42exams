@@ -1,42 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_split.c                                         :+:      :+:    :+:   */
+/*   ft_list_foreach.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: asafrono <asafrono@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/08 16:23:18 by asafrono          #+#    #+#             */
-/*   Updated: 2025/01/08 16:26:27 by asafrono         ###   ########.fr       */
+/*   Created: 2025/01/08 16:03:08 by asafrono          #+#    #+#             */
+/*   Updated: 2025/01/08 16:13:30 by asafrono         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-char	**ft_split(char *str)
+typedef struct    s_list
 {
-	char	**arr;
-	int		j;
-	int		k;
+    struct s_list *next;
+    void          *data;
+}                 t_list;
 
-	arr = (char **)malloc(sizeof(char *) * 1000);
-	while (*str == ' ' || *str == '\t' || *str == '\n')
-		str++;
-	j = 0;
-	while (*str != '\0')
+void    ft_list_foreach(t_list *begin_list, void (*f)(void *))
+{
+	t_list *list;
+
+	list = begin_list;
+	while (list)
 	{
-		if (*str > ' ')
-		{
-			k = 0;
-			arr[j] = (char *)malloc(sizeof(char) * 1000);
-			while (*str > ' ')
-				arr[j][k++] = *str++;
-			arr[j][k] = '\0';
-			j++;
-		}
-		else
-			str++;
+		(*f)(list->data);
+		list = list->next;
 	}
-	arr[j] = 0;
-	return (arr);
 }

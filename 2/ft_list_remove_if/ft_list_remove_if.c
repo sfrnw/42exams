@@ -1,42 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_split.c                                         :+:      :+:    :+:   */
+/*   ft_list_remove_if.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: asafrono <asafrono@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/08 16:23:18 by asafrono          #+#    #+#             */
-/*   Updated: 2025/01/08 16:26:27 by asafrono         ###   ########.fr       */
+/*   Created: 2025/01/08 16:03:08 by asafrono          #+#    #+#             */
+/*   Updated: 2025/01/08 16:21:29 by asafrono         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
-#include <stdio.h>
+#include "ft_list.h"
 
-char	**ft_split(char *str)
+void ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)())
 {
-	char	**arr;
-	int		j;
-	int		k;
+	t_list *list;
 
-	arr = (char **)malloc(sizeof(char *) * 1000);
-	while (*str == ' ' || *str == '\t' || *str == '\n')
-		str++;
-	j = 0;
-	while (*str != '\0')
+	if (begin_list == NULL || *begin_list == NULL)
+		return;
+	list = *begin_list;
+
+	if(cmp(list->data, data_ref) == 0)
 	{
-		if (*str > ' ')
-		{
-			k = 0;
-			arr[j] = (char *)malloc(sizeof(char) * 1000);
-			while (*str > ' ')
-				arr[j][k++] = *str++;
-			arr[j][k] = '\0';
-			j++;
-		}
-		else
-			str++;
+		*begin_list = list->next;
+		free(list);
+		ft_list_remove_if(begin_list,data_ref, cmp);
 	}
-	arr[j] = 0;
-	return (arr);
+	list = *begin_list;
+	ft_list_remove_if(list->next,data_ref, cmp);
 }
