@@ -6,7 +6,7 @@
 /*   By: asafrono <asafrono@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/11 13:38:31 by asafrono          #+#    #+#             */
-/*   Updated: 2025/05/11 16:14:51 by asafrono         ###   ########.fr       */
+/*   Updated: 2025/05/11 16:44:30 by asafrono         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ int	main(int argc, char *argv[], char *env[])
 	
 	(void)argc;
 	i = 0;
+	tmp_fd = dup(STDIN_FILENO);
 	if (tmp_fd == -1)  // Initial dup check
 		ft_fatal_error();
 	
