@@ -6,7 +6,7 @@
 /*   By: asafrono <asafrono@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/11 13:38:31 by asafrono          #+#    #+#             */
-/*   Updated: 2025/05/11 15:43:24 by asafrono         ###   ########.fr       */
+/*   Updated: 2025/05/11 16:14:51 by asafrono         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <stdlib.h>
+
+
 
 /* Custom error message writer to STDERR
  * @param str: Base error message
@@ -29,6 +31,12 @@ void	ft_putstr_fd2(char *str, char *arg)
 	write(2, "\n", 1);
 }
 
+void ft_fatal_error(void)
+{
+    ft_putstr_fd2("error: fatal", NULL);
+    exit(1);
+}
+
 /* Execute command in child process
  * @param argv: Command and arguments array
  * @param i: Index where command ends (at ; or |)
@@ -40,7 +48,9 @@ void ft_execute(char *argv[], int i, int tmp_fd, char *env[])
 	//we are here in the child so it has no impact in the parent process.
 	
 	argv[i] = NULL; // Terminate command array for execve
-	dup2(tmp_fd, STDIN_FILENO); // Redirect input
+	// Redirect input
+	if (dup2(tmp_fd, STDIN_FILENO) == -1)  // Added error check
+		ft_fatal_error();
 	close(tmp_fd);
 	execve(argv[0], argv, env);
 	ft_putstr_fd2("error: cannot execute ", argv[0]);
@@ -49,13 +59,15 @@ void ft_execute(char *argv[], int i, int tmp_fd, char *env[])
 
 int	main(int argc, char *argv[], char *env[])
 {
-	int	i;
-	int fd[2]; // Pipe file descriptors [read, write]
-	int tmp_fd;  // Stores input source for next command
+	int		i;
+	int 	fd[2]; // Pipe file descriptors [read, write]
+	int 	tmp_fd;  // Stores input source for next command
+	pid_t 	pid;
+	
 	(void)argc;
-
 	i = 0;
-	tmp_fd = dup(STDIN_FILENO); // Initial input from stdin
+	if (tmp_fd == -1)  // Initial dup check
+		ft_fatal_error();
 	
 	// Process commands until end of arguments
 	while (argv[i] && argv[i + 1]) //check if the end is reached
@@ -80,7 +92,10 @@ int	main(int argc, char *argv[], char *env[])
 		// Execute regular command ending with ; or EOL
 		else if (i != 0 && (argv[i] == NULL || strcmp(argv[i], ";") == 0)) //exec in stdout
 		{
-			if (fork() == 0) // Child process
+			pid = fork();  // Store fork result
+			if (pid == -1)
+				ft_fatal_error();
+			if (pid == 0) // Child process
 				ft_execute(argv, i, tmp_fd, env);
 			else // Parent process
 			{
@@ -89,15 +104,22 @@ int	main(int argc, char *argv[], char *env[])
 				while(waitpid(-1, NULL, WUNTRACED) != -1)
 					;
 				tmp_fd = dup(STDIN_FILENO); // Reset input for next command
+				if (tmp_fd == -1)  // Check dup after wait
+					ft_fatal_error();
 			}
 		}
 		// Handle pipe operation
 		else if(i != 0 && strcmp(argv[i], "|") == 0) //pipe
 		{
-			pipe(fd);
-			if (fork() == 0) // Child writes to pipe
+			if (pipe(fd) == -1)  // Pipe error check
+				ft_fatal_error();
+			pid = fork();  // Store fork result
+			if (pid == -1)
+				ft_fatal_error();
+			if (pid == 0) // Child writes to pipe
 			{
-				dup2(fd[1], STDOUT_FILENO);
+				if (dup2(fd[1], STDOUT_FILENO) == -1)  // Output redirection check
+					ft_fatal_error();
 				close(fd[0]);
 				close(fd[1]);
 				ft_execute(argv, i, tmp_fd, env);

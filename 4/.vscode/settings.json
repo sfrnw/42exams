@@ -1,6 +1,7 @@
 {
 	"files.associations": {
 		"cstdlib": "c",
-		"format": "c"
+		"format": "c",
+		"random": "c"
 	}
 }
