@@ -6,7 +6,7 @@
 /*   By: asafrono <asafrono@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/11 13:38:31 by asafrono          #+#    #+#             */
-/*   Updated: 2025/05/11 16:44:30 by asafrono         ###   ########.fr       */
+/*   Updated: 2025/05/13 17:26:13 by asafrono         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
  * @param str: Base error message
  * @param arg: Optional argument to append to message */
 
-void	ft_putstr_fd2(char *str, char *arg)
+void ft_putstr_fd2(char *str, char *arg)
 {
 	while (*str)
 		write(2, str++, 1);
@@ -33,8 +33,8 @@ void	ft_putstr_fd2(char *str, char *arg)
 
 void ft_fatal_error(void)
 {
-    ft_putstr_fd2("error: fatal", NULL);
-    exit(1);
+	ft_putstr_fd2("error: fatal", NULL);
+	exit(1);
 }
 
 /* Execute command in child process
@@ -46,7 +46,7 @@ void ft_execute(char *argv[], int i, int tmp_fd, char *env[])
 {
 	//overwrite ; or | or NULL with NULL to use the array as input for execve.
 	//we are here in the child so it has no impact in the parent process.
-	
+
 	argv[i] = NULL; // Terminate command array for execve
 	// Redirect input
 	if (dup2(tmp_fd, STDIN_FILENO) == -1)  // Added error check
@@ -63,13 +63,13 @@ int	main(int argc, char *argv[], char *env[])
 	int 	fd[2]; // Pipe file descriptors [read, write]
 	int 	tmp_fd;  // Stores input source for next command
 	pid_t 	pid;
-	
+
 	(void)argc;
 	i = 0;
 	tmp_fd = dup(STDIN_FILENO);
 	if (tmp_fd == -1)  // Initial dup check
 		ft_fatal_error();
-	
+
 	// Process commands until end of arguments
 	while (argv[i] && argv[i + 1]) //check if the end is reached
 	{

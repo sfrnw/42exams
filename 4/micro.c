@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+0/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   micro.c                                            :+:      :+:    :+:   */
@@ -54,22 +54,19 @@ int main (int argc, char **argv, char **env)
 	tmp_fd = dup(0);
 	if (tmp_fd == -1)
 		ft_fatal_error();
-	
 	while (argv[i] && argv[i+1])
 	{
 		argv = &argv[i+1];
 		i = 0;
-
 		while(argv[i] && strcmp(argv[i], ";") && strcmp(argv[i], "|"))
 			i++;
-		
 		if (strcmp(argv[0], "cd") == 0)
 		{
 			if (i != 2)
 				ft_putstr_fd2("error: cd: bad arguments", NULL);
 			else if(chdir(argv[1]) != 0)
 				ft_putstr_fd2("error: cd: cannot change directory to ", argv[1]);
-		} 
+		}
 		else if (i != 0 && (argv[i] == NULL || strcmp(argv[i], ";") == 0))
 		{
 			pid = fork();
